@@ -6,14 +6,13 @@ from thyroid.components.data_resampling import DataResampling
 from thyroid.components.model_training import ModelTrainer
 
 database_name = "Thyroid_database"
-collection_name1 = "hyperthyroid_data"
-collection_name2 = "hypothyroid_data"
+collection_name = "hyperthyroid_data"
 mongo_client = pymongo.MongoClient("mongodb+srv://Nelson_1601:<password>@cluster0.nxxmtd3.mongodb.net/?retryWrites=true&w=majority")
 
 
 if __name__ == "__main__":
 
-	data_ingestion = DataIngestion(mongo_client=mongo_client, database_name=database_name, collection_name1=collection_name1, collection_name2=collection_name2)
+	data_ingestion = DataIngestion(mongo_client=mongo_client, database_name=database_name, collection_name=collection_name)
 	raw_data_path = data_ingestion.initiate_data_ingestion()
 
 	data_cleaning = DataCleaning(raw_data_path=raw_data_path)

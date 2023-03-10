@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.svm import SVR
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from thyroid.logger import logging
 from thyroid.exception import ThyroidException
 
@@ -46,6 +46,7 @@ class ModelTrainer:
 										  index=classification_models.keys(), 
 										  dtype=object)
 
+			logging.info(f"Reading the data for training and testing the model")
 			x_train = pd.read_csv(f'{self.resampled_data_path}/x_train.csv')
 			y_train = pd.read_csv(f'{self.resampled_data_path}/y_train.csv')
 
@@ -61,9 +62,7 @@ class ModelTrainer:
 				predictions = thyroid_model.predict(x_test)
 				score = accuracy_score(predictions, y_test)
 				score = round(score*100, 2)
-				matrix = confusion_matrix(predictions, y_test)
-				print(matrix)
-				print() 
+
 				logging.info(f'accuracy using {accuracy_table.index[i]}: {score}')
 
 				accuracy_table['accuracy'][i] = score

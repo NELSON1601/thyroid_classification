@@ -11,7 +11,7 @@ class DataCleaning:
 
 		try:
 			self.raw_data_path = raw_data_path
-			self.outlier_threshold = 2.5
+			self.outlier_threshold = 3
 
 		except Exception as e:
 			raise ThyroidException(e, sys)
@@ -19,7 +19,6 @@ class DataCleaning:
 	def drop_unwanted_columns(self, data):
 		try:
 			unwanted_column_name = ['_id', 'ID','TBG','TBG_measured','referral_source']
-
 			data.drop(columns=unwanted_column_name, inplace=True)
 			return data
 
@@ -27,26 +26,8 @@ class DataCleaning:
 			raise ThyroidException(e, sys)
 		
 
-	def clean_target_features(self, data):
-		try:
-			data.replace(['hyperthyroid', 'T3_toxic', 'goitre', 'secondary_toxic'], 
-						  'hyperthyroid', inplace=True)
-
-			data.replace(['hypothyroid', 'compensated_hypothyroid', 'primary_hypothyroid', 'secondary_hypothyroid'], 
-						  'hypothyroid', inplace=True)
-			return data
-
-		except Exception as e:
-			raise ThyroidException(e, sys)
-
-
-	def drop_missing_column(self):
-		pass
-
-
 	def fill_not_measured_values(self, data, columns):
 		try:
-			data.replace(['?'], np.nan, inplace=True)
 			for column in columns:
 				data[column].fillna(0, inplace=True)
 			return data
@@ -93,28 +74,36 @@ class DataCleaning:
 	def initiate_data_cleaning(self):
 
 		try:
-			
+			logging.info(f"Reading the data for cleaning...")
 			thyroid_data = pd.read_csv(f'{self.raw_data_path}/thyroid_data.csv')
 
+			logging.info(f"Replacing ? as NaN")
+			thyroid_data.replace(['?'], np.nan, inplace=True)
+
+			logging.info(f"Droping unwanted columns")
 			thyroid_data = self.drop_unwanted_columns(data=thyroid_data)
 
-			thyroid_data = self.clean_target_features(data=thyroid_data)
-
+			logging.info(f"Filling the note measured value with zero")
 			columns = ['TSH', 'T3', 'TT4', 'T4U', 'FTI']
 			thyroid_data = self.fill_not_measured_values(data=thyroid_data, columns=columns)
 
+			logging.info(f"Changing the dtype of numerical columns")
 			columns = ['age', 'TSH', 'T3', 'TT4', 'T4U', 'FTI']
 			thyroid_data = self.change_column_dtypes(data=thyroid_data, columns=columns, dtype=float)
 
+			logging.info(f"Removing the outliers which are over {self.outlier_threshold} std")			
 			thyroid_data = self.remove_outliers(data=thyroid_data, columns=columns, threshold=self.outlier_threshold)
 
+			logging.info(f"Filling the missing values using mean and mode")
 			thyroid_data = self.fill_missing_values(data=thyroid_data)
 
 			thyroid_data.reset_index(drop=False, inplace=False)
 
+			logging.info(f"Creating a directory for clean data")
 			clean_data_dir = os.path.join(os.getcwd(), 'Data/clean_data')
 			os.makedirs(clean_data_dir, exist_ok=True)
 
+			logging.info(f"Saving the data into clean data directory")
 			thyroid_data.to_csv(f'{clean_data_dir}/thyroid_data.csv', index=False, header=True)
 			
 			return clean_data_dir
