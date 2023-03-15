@@ -71,6 +71,7 @@ class DataCleaning:
 		except Exception as e:
 			raise ThyroidException(e, sys)
 
+
 	def initiate_data_cleaning(self):
 
 		try:
@@ -98,6 +99,9 @@ class DataCleaning:
 			thyroid_data = self.fill_missing_values(data=thyroid_data)
 
 			thyroid_data.reset_index(drop=False, inplace=False)
+			thyroid_data = thyroid_data[['sex', 'on_thyroxine', 'on_antithyroid_medication', 'pregnant', 'query_hyperthyroid',\
+										 'tumor', 'psych', 'TSH', 'T3_measured', 'T3', 'TT4_measured', 'TT4',\
+										 'T4U_measured', 'T4U', 'FTI_measured', 'FTI', 'Target']]
 
 			logging.info(f"Creating a directory for clean data")
 			clean_data_dir = os.path.join(os.getcwd(), 'Data/clean_data')
