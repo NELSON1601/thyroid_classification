@@ -1,3 +1,4 @@
 ,accuracy
 random_forest,99.09
-decision_tree,98.82
+decision_tree,99.09
+catboost,99.0

@@ -11,6 +11,7 @@ class DataTransformation:
 	def __init__(self, clean_data_path):
 		try:
 			self.clean_data_path = clean_data_path
+			self.target = 'Target'
 
 		except Exception as e:
 			raise ThyroidException(e, sys)
@@ -49,6 +50,7 @@ class DataTransformation:
 		except Exception as e:
 			raise ThyroidException(e, sys)
 
+
 	def initiate_data_transformation(self):
 		try:
 			logging.info(f"Reading the data for transformation...")
@@ -63,7 +65,8 @@ class DataTransformation:
 					training_data[column], testing_data[column] = self.categorical_encoding(training_data[column], testing_data[column])
 
 			# logging.info(f"Scaling the data using StandardScaler")
-			# training_data, testing_data = self.feature_scaling(training_data, testing_data)
+			# columns = [i for i in training_data.columns if i != self.target]
+			# training_data[columns], testing_data[columns] = self.feature_scaling(training_data[columns], testing_data[columns])
 
 			logging.info(f"Creating a transformed data directory")
 			transformed_data_dir = os.path.join(os.getcwd(), 'Data/transformed_data')
